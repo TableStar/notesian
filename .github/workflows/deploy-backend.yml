@@ -12,5 +12,5 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Call Coolify Deploy WebHook
+      - name: Call Coolify Deployment WebHook
         run: curl -X POST ${{secrets.COOLIFY_BACK_DEPLOY_HOOK}}
