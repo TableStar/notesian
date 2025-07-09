@@ -13,4 +13,6 @@ jobs:
     steps:
       - name: Call Coolify Deployment WebHook
         run: |
-          curl -v --fail --show-error -X POST "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}"
+          curl -v --fail --show-error -X POST \
+            --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}'' \
+            "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}"
