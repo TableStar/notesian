@@ -13,4 +13,4 @@ jobs:
     steps:
       - name: Call Coolify Deployment WebHook
         run: |
-          curl --fail --show-error -X POST "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}"
+          curl -v --fail --show-error -X POST "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}"
