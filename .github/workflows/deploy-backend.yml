@@ -1,0 +1,16 @@
+name: Deploy Back to Coolify
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+        - 'back/***'
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Coolify Deploy WebHook
+        run: curl -X POST ${{secrets.COOLIFY_BACK_DEPLOY_HOOK}}
