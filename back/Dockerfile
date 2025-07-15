@@ -5,9 +5,10 @@ ARG PB_VERSION=0.28.4
 RUN apk add --no-cache \
     unzip \
     curl \
-    ca-certificates
+    ca-certificates \
+    wget
 
-# download and unzip PocketBaseT
+# download and unzip PocketBase
 
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/
