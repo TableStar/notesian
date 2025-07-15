@@ -56,7 +56,7 @@ jobs:
             echo "Checking URL: $STATUS_URL"
 
             # Get the current status
-            STATUS_RESPONSE=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" $STATUS_URL)
+            STATUS_RESPONSE=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "$STATUS_URL")
 
             # --- CRUCIAL DEBUGGING STEP ---
             echo "--- RAW STATUS RESPONSE ---"
