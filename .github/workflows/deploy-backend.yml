@@ -11,8 +11,58 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Call Coolify Deployment WebHook
+      - name: Trigger Deploy & Get UUID
+        id: trigger
         run: |
-          curl -v --fail --show-error -X POST \
-            --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}' \
-            "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}"
+          RESPONSE_JSON=$(curl -s -X \
+           --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+           "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}")
+           
+           if echo "$RESPONSE_JSON" | grep -q "error"; then
+           echo "Error triggering deployment:"
+           echo "$RESPONSE_JSON"
+           exit 1
+           fi
+
+           DEPLOYMENT_UUID=$(echo "$RESPONSE_JSON" | jq -r '.deployment_uuid')
+           echo "deployment_uuid=$DEPLOYMENT_UUID" >> $GITHUB_OUTPUT
+
+      - name: 2. Wait for Deployment to Finish
+        run: |
+          # Install jq, a command-line JSON processor
+          sudo apt-get install -y jq
+
+          # The UUIDs needed for the status check
+          APP_UUID="${{ secrets.COOLIFY_APPLICATION_UUID }}"
+          DEPLOYMENT_UUID="${{ steps.trigger.outputs.deployment_uuid }}"
+          
+          # Polling settings
+          TIMEOUT_MINUTES=10
+          SLEEP_SECONDS=15
+          MAX_ATTEMPTS=$((TIMEOUT_MINUTES * 60 / SLEEP_SECONDS))
+
+          echo "Waiting for deployment ${DEPLOYMENT_UUID} to complete..."
+
+          for (( i=1; i<=MAX_ATTEMPTS; i++ )); do
+            # The API endpoint to check the status
+            STATUS_URL="${{secrets.COOLIFY_API_URL}}/api/v1/applications/${APP_UUID}/deployments/${DEPLOYMENT_UUID}"
+            
+            # Get the current status
+            STATUS_RESPONSE=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" $STATUS_URL)
+            STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.status')
+
+            echo "Attempt $i/$MAX_ATTEMPTS: Current status is '${STATUS}'"
+
+            if [[ "$STATUS" == "finished" ]]; then
+              echo "✅ Deployment finished successfully!"
+              exit 0
+            elif [[ "$STATUS" == "failed" || "$STATUS" == "canceled" ]]; then
+              echo "❌ Deployment failed with status: ${STATUS}"
+              exit 1
+            fi
+            
+            sleep $SLEEP_SECONDS
+          done
+
+          echo "❌ Timeout: Deployment did not finish within ${TIMEOUT_MINUTES} minutes."
+          exit 1
