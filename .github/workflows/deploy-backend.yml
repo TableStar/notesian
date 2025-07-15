@@ -15,7 +15,7 @@ jobs:
         id: trigger
         run: |
           RESPONSE_JSON=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK }}")
-
+          
           # Check if the response contains an error message
           if echo "$RESPONSE_JSON" | jq -e 'has("error")' > /dev/null; then
             echo "Error triggering deployment:"
@@ -25,7 +25,7 @@ jobs:
 
           # Use the CORRECT jq path to parse the deployment_uuid
           DEPLOYMENT_UUID=$(echo "$RESPONSE_JSON" | jq -r '.deployments[0].deployment_uuid')
-
+          
           # Check if the UUID was actually found
           if [ -z "$DEPLOYMENT_UUID" ] || [ "$DEPLOYMENT_UUID" == "null" ]; then
             echo "Could not find deployment_uuid in the server response."
@@ -34,7 +34,7 @@ jobs:
           fi
 
           echo "deployment_uuid=$DEPLOYMENT_UUID" >> $GITHUB_OUTPUT
-
+          
       - name: 2. Wait for Deployment to Finish
         run: |
           # Install jq, a command-line JSON processor
