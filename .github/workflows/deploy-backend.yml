@@ -37,13 +37,10 @@ jobs:
           
       - name: 2. Wait for Deployment to Finish
         run: |
-          # Install jq, a command-line JSON processor
-          sudo apt-get install -y jq
-
           # The UUIDs needed for the status check
           APP_UUID="${{ secrets.COOLIFY_APPLICATION_UUID }}"
           DEPLOYMENT_UUID="${{ steps.trigger.outputs.deployment_uuid }}"
-
+          
           # Polling settings
           TIMEOUT_MINUTES=10
           SLEEP_SECONDS=15
@@ -55,8 +52,18 @@ jobs:
             # The API endpoint to check the status
             STATUS_URL="${{secrets.COOLIFY_API_URL}}/api/v1/applications/${APP_UUID}/deployments/${DEPLOYMENT_UUID}"
             
+            # --- CRUCIAL DEBUGGING STEP ---
+            echo "Checking URL: $STATUS_URL"
+
             # Get the current status
             STATUS_RESPONSE=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" $STATUS_URL)
+
+            # --- CRUCIAL DEBUGGING STEP ---
+            echo "--- RAW STATUS RESPONSE ---"
+            echo "$STATUS_RESPONSE"
+            echo "--- END RAW STATUS RESPONSE ---"
+
+            # This jq command will fail again, but the log above will tell us why.
             STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.status')
 
             echo "Attempt $i/$MAX_ATTEMPTS: Current status is '${STATUS}'"
