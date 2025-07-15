@@ -11,21 +11,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Deploy & Get UUID
+      - name: 1. Trigger Deployment and Get Deployment UUID
         id: trigger
         run: |
-          RESPONSE_JSON=$(curl -s \
-           --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
-           "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}")
-           
-           if echo "$RESPONSE_JSON" | grep -q "error"; then
-           echo "Error triggering deployment:"
-           echo "$RESPONSE_JSON"
-           exit 1
-           fi
+          # Execute the curl command on a single line to avoid any line-break issues.
+          RESPONSE_JSON=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}")
 
-           DEPLOYMENT_UUID=$(echo "$RESPONSE_JSON" | jq -r '.deployment_uuid')
-           echo "deployment_uuid=$DEPLOYMENT_UUID" >> $GITHUB_OUTPUT
+          # --- CRUCIAL DEBUGGING STEP ---
+          # Print the raw response we got from the server.
+          echo "--- RAW SERVER RESPONSE ---"
+          echo "$RESPONSE_JSON"
+          echo "--- END RAW SERVER RESPONSE ---"
+
+          # Now, try to parse the response with jq.
+          # This will likely fail again, but the log above will tell us why.
+          DEPLOYMENT_UUID=$(echo "$RESPONSE_JSON" | jq -r '.deployment_uuid')
+
+          # If jq fails, the script will exit here with an error.
+          # If it succeeds, we set the output.
+          echo "deployment_uuid=$DEPLOYMENT_UUID" >> $GITHUB_OUTPUT
 
       - name: 2. Wait for Deployment to Finish
         run: |
@@ -35,7 +39,7 @@ jobs:
           # The UUIDs needed for the status check
           APP_UUID="${{ secrets.COOLIFY_APPLICATION_UUID }}"
           DEPLOYMENT_UUID="${{ steps.trigger.outputs.deployment_uuid }}"
-          
+
           # Polling settings
           TIMEOUT_MINUTES=10
           SLEEP_SECONDS=15
