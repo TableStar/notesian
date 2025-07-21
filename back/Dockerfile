@@ -8,7 +8,7 @@ RUN apk add --no-cache \
     ca-certificates \
     wget
 
-# download and unzip PocketBase
+# download and unzip PocketBasee
 
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/
