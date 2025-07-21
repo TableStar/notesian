@@ -1,11 +1,11 @@
-name: Deploy Back to Coolify
+name: Deploy Backend to Coolify
 
 on:
   push:
     branches:
       - main
     paths:
-      - "back/**"
+      - 'back/**'
 
 jobs:
   deploy:
@@ -16,17 +16,14 @@ jobs:
         run: |
           RESPONSE_JSON=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "${{ secrets.COOLIFY_BACK_DEPLOY_HOOK }}")
           
-          # Check if the response contains an error message
           if echo "$RESPONSE_JSON" | jq -e 'has("error")' > /dev/null; then
             echo "Error triggering deployment:"
             echo "$RESPONSE_JSON" | jq
             exit 1
           fi
 
-          # Use the CORRECT jq path to parse the deployment_uuid
           DEPLOYMENT_UUID=$(echo "$RESPONSE_JSON" | jq -r '.deployments[0].deployment_uuid')
           
-          # Check if the UUID was actually found
           if [ -z "$DEPLOYMENT_UUID" ] || [ "$DEPLOYMENT_UUID" == "null" ]; then
             echo "Could not find deployment_uuid in the server response."
             echo "Response was: $RESPONSE_JSON"
@@ -37,11 +34,7 @@ jobs:
           
       - name: 2. Wait for Deployment to Finish
         run: |
-          # The UUIDs needed for the status check
-          APP_UUID="${{ secrets.COOLIFY_APPLICATION_UUID }}"
           DEPLOYMENT_UUID="${{ steps.trigger.outputs.deployment_uuid }}"
-          
-          # Polling settings
           TIMEOUT_MINUTES=10
           SLEEP_SECONDS=15
           MAX_ATTEMPTS=$((TIMEOUT_MINUTES * 60 / SLEEP_SECONDS))
@@ -49,21 +42,8 @@ jobs:
           echo "Waiting for deployment ${DEPLOYMENT_UUID} to complete..."
 
           for (( i=1; i<=MAX_ATTEMPTS; i++ )); do
-            # The API endpoint to check the status
             STATUS_URL="${{secrets.COOLIFY_API_URL}}/api/v1/deployments/${DEPLOYMENT_UUID}"
-            
-            # --- CRUCIAL DEBUGGING STEP ---
-            echo "Checking URL: $STATUS_URL"
-
-            # Get the current status
             STATUS_RESPONSE=$(curl -s --header "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" "$STATUS_URL")
-
-            # --- CRUCIAL DEBUGGING STEP ---
-            echo "--- RAW STATUS RESPONSE ---"
-            echo "$STATUS_RESPONSE"
-            echo "--- END RAW STATUS RESPONSE ---"
-
-            # This jq command will fail again, but the log above will tell us why.
             STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.status')
 
             echo "Attempt $i/$MAX_ATTEMPTS: Current status is '${STATUS}'"
