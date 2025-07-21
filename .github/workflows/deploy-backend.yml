@@ -50,7 +50,7 @@ jobs:
 
           for (( i=1; i<=MAX_ATTEMPTS; i++ )); do
             # The API endpoint to check the status
-            STATUS_URL="${{secrets.COOLIFY_API_URL}}/api/v1/applications/${APP_UUID}/deployments/${DEPLOYMENT_UUID}"
+            STATUS_URL="${{secrets.COOLIFY_API_URL}}/api/v1/deployments/${DEPLOYMENT_UUID}"
             
             # --- CRUCIAL DEBUGGING STEP ---
             echo "Checking URL: $STATUS_URL"
