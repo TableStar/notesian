@@ -11,6 +11,8 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Building, Chrome } from "lucide-react";
 import z, { email } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,6 +29,17 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (val:LoginForm) => {
+    console.log(val)
+  }
   return (
     <div className="flex flex-col justify-center items-center min-h-screen gap-12">
       <div className="text-center">
