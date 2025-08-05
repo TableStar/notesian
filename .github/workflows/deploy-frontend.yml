@@ -1,4 +1,4 @@
-name: Deploy Backend to Coolify
+name: Deploy Front to Coolify
 
 on:
   push:
