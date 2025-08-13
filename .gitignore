@@ -1,3 +1,4 @@
 pb_data/
 CHANGELOG.md
 back/pocketbase
+.env
