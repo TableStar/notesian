@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { Outlet, replace, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/authContext";
 import { authService } from "~/services/authService";
 import type { Route } from "./+types/_dash.layout";
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/app-sidebar";
-
+import { GlobalSpinner } from "~/root";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -17,19 +17,24 @@ export function meta({}: Route.MetaArgs) {
 const DashLayout = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoggedIn) {
       navigate("/", { replace: true });
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, mounted]);
 
   const handleLogout = () => {
     authService.logout();
   };
 
-  if (!isLoggedIn) {
-    return null;
+  if (!mounted || !isLoggedIn) {
+    return <GlobalSpinner />;
   }
 
   return (
