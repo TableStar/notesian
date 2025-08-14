@@ -9,6 +9,9 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { AuthProvider } from "./contexts/authContext";
+import { ThemeProvider } from "./components/theme-provider";
+import { Toaster } from "./components/ui/sonner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,7 +28,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,12 +36,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
+}
+
+function GlobalSpinner() {
+  return (
+    <div className="flex flex-col justify-center items-center h-screen gap-3">
+      <div className="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-red-600" />
+      <div>Loading....</div>
+    </div>
+  );
+}
+
+export function HydrateFallback() {
+  return <GlobalSpinner />;
 }
 
 export default function App() {

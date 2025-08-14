@@ -1,27 +1,46 @@
-import { Outlet } from "react-router";
+import { useEffect } from "react";
+import { Outlet, replace, useNavigate } from "react-router";
+import { useAuth } from "~/contexts/authContext";
+import { authService } from "~/services/authService";
+import type { Route } from "./+types/_dash.layout";
+import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { AppSidebar } from "~/components/app-sidebar";
 
-const Sidebar = () => {
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "Kostosian" },
+    { name: "description", content: "Manajemen Kos" },
+  ];
+}
+
+const DashLayout = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/", { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
+
+  const handleLogout = () => {
+    authService.logout();
+  };
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
   return (
-    <div className="w-50 border-r p-4">
-      <h2>MuhKost</h2>
-      <nav>
-        <ul>
-          <li>Dashboard</li>
-          <li>Rooms</li>
-          <li>Settings</li>
-        </ul>
-      </nav>
-    </div>
+    <SidebarProvider>
+      <AppSidebar onLogout={handleLogout} />
+      {/* <Sidebar onLogOut={handleLogout} /> */}
+      <main>
+        <SidebarTrigger />
+        <Outlet />
+      </main>
+    </SidebarProvider>
   );
-}
-
-export const DashLayout = () => {
-  return (
-    <div className="flex h-25">
-        <Sidebar/>
-        <main className="flex p-4">
-            <Outlet/>
-        </main>
-    </div>
-  )
-}
+};
+export default DashLayout;
