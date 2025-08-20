@@ -1,5 +1,5 @@
 import { type RecordModel } from "pocketbase";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { pb } from "~/lib/pocketbase";
 
 type AuthContextType = {
