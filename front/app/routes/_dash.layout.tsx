@@ -41,7 +41,7 @@ const DashLayout = () => {
     <SidebarProvider>
       <AppSidebar onLogout={handleLogout} />
       {/* <Sidebar onLogOut={handleLogout} /> */}
-      <main>
+      <main className="flex-1">
         <SidebarTrigger />
         <Outlet />
       </main>

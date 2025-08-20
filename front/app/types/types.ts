@@ -6,3 +6,14 @@ export const loginSchema = z.object({
 });
 
 export type LoginForm = z.infer<typeof loginSchema>;
+
+export type Room = {
+  number: string;
+  status: "vacant" | "occupied" | "maintenance";
+  hasAC: boolean;
+}
+
+export type RoomCardProps = {
+  room: Room;
+  onClick?: () => void;
+}
