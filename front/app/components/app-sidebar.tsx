@@ -37,13 +37,13 @@ export function AppSidebar({ onLogout }: { onLogout: () => void }) {
   const {pathname} = useLocation();
 
   return (
-    <Sidebar className="border-r border-sidebar-border bg-sidebar">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex size-10 group-data-[collapsible=icon]:size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Building className="h-5 w-5" />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <h1 className="text-lg font-semibold text-sidebar-foreground">
               Kostosian
             </h1>
@@ -81,7 +81,7 @@ export function AppSidebar({ onLogout }: { onLogout: () => void }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="h-12 px-3 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="size-6">
                     {/* <AvatarImage
                       src="/placeholder.svg?height=32&width=32"
                       alt="User"

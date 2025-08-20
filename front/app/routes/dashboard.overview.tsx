@@ -42,6 +42,7 @@ export const clientLoader = async ({}: Route.ClientLoaderArgs) => {
     const rentalInfo = occupiedRoomsMap.get(room.id);
 
     return {
+      id:room.id,
       number: room.room_num,
       status: isOccupied ? "occupied" : "vacant",
       hasAC: isOccupied ? rentalInfo?.ac_included : room.has_ac,
@@ -105,9 +106,9 @@ const Overview = ({ loaderData }: Route.ComponentProps) => {
           <CardTitle>Live Room Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
+          <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6 max-h-87 md:max-h-full overflow-y-auto">
             {rooms.map((room) => (
-              <RoomCardMinimalist room={room}/>
+              <RoomCardMinimalist key={room.id} room={room}/>
             ))}
           </div>
         </CardContent>

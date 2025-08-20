@@ -42,7 +42,7 @@ const DashLayout = () => {
       <AppSidebar onLogout={handleLogout} />
       {/* <Sidebar onLogOut={handleLogout} /> */}
       <main className="flex-1">
-        <SidebarTrigger />
+        <SidebarTrigger className="sticky top-0" />
         <Outlet />
       </main>
     </SidebarProvider>

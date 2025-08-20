@@ -8,6 +8,7 @@ export const loginSchema = z.object({
 export type LoginForm = z.infer<typeof loginSchema>;
 
 export type Room = {
+  id:string;
   number: string;
   status: "vacant" | "occupied" | "maintenance";
   hasAC: boolean;
