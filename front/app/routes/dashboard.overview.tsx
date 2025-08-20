@@ -2,9 +2,7 @@ import { pb } from "~/lib/pocketbase";
 import type { Route } from "./+types/dashboard.overview";
 import { Header } from "~/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Bed, CheckCircle, DollarSign, Snowflake, User } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
-import { RoomCardColored } from "~/components/dashboard/room-card-colored";
+import { Bed, CheckCircle, DollarSign, User } from "lucide-react";
 import type { Room } from "~/types/types";
 import { RoomCardMinimalist } from "~/components/dashboard/room-card-minimal";
 
