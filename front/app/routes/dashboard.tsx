@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "~/contexts/authContext";
 import { authService } from "~/services/authService";
-import type { Route } from "./+types/_dash.layout";
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/app-sidebar";
 import { GlobalSpinner } from "~/root";
+import type { Route } from "./+types/dashboard";
 
 export function meta({}: Route.MetaArgs) {
   return [
