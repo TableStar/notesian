@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -12,6 +13,10 @@ import "./app.css";
 import { AuthProvider } from "./contexts/authContext";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "./components/ui/sonner";
+import {
+  GlobalSpinner,
+  NavigationSpinner,
+} from "./components/ui/loading-spinner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -52,21 +57,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function GlobalSpinner() {
-  return (
-    <div className="flex flex-col justify-center items-center h-screen gap-3">
-      <div className="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-red-600" />
-      <div>Loading....</div>
-    </div>
-  );
-}
-
 export function HydrateFallback() {
   return <GlobalSpinner />;
 }
 
 export default function App() {
-  return <Outlet />;
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
+
+   const showSpinner = isNavigating && (
+    navigation.state === navigation.formAction // Show for form submissions
+  );
+  return (
+    <>
+      {showSpinner && <NavigationSpinner />}
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

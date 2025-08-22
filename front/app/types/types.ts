@@ -18,3 +18,14 @@ export type RoomCardProps = {
   room: Room;
   onClick?: () => void;
 }
+
+export type RoomPb = {
+  id: string;
+  created: string;       // ISO datetime string
+  updated: string;       // ISO datetime string
+  owner: string;         // owner ID
+  room_num: string;      // stored as string
+  base_price_month: number;
+  has_ac: boolean;
+  notes: string;
+};

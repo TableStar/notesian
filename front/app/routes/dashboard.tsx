@@ -4,8 +4,8 @@ import { useAuth } from "~/contexts/authContext";
 import { authService } from "~/services/authService";
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/app-sidebar";
-import { GlobalSpinner } from "~/root";
 import type { Route } from "./+types/dashboard";
+import { GlobalSpinner } from "~/components/ui/loading-spinner";
 
 export function meta({}: Route.MetaArgs) {
   return [

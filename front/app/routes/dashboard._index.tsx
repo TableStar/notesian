@@ -1,5 +1,5 @@
 import { pb } from "~/lib/pocketbase";
-import type { Route } from "./+types/dashboard.overview";
+import type { Route } from "./+types/dashboard._index";
 import { Header } from "~/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Bed, CheckCircle, DollarSign, User } from "lucide-react";
