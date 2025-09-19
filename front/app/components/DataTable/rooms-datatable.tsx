@@ -87,9 +87,9 @@ export const RoomsDataTable = <TData, TValue>({
 
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 py-4">
+    <div className="w-xs md:w-full">
+      <div className="flex flex-col-reverse md:flex-row items-start md:items-center justify-between">
+        <div className="flex items-center gap-4 py-4 w-full">
           <Input
             placeholder="Filter by room number..."
             value={
@@ -109,10 +109,10 @@ export const RoomsDataTable = <TData, TValue>({
             </Button>
           )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 justify-between w-full md:justify-start">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button variant="outline" className="md:ml-auto">
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
                 View
               </Button>

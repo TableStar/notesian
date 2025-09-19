@@ -40,9 +40,9 @@ const Rooms = ({ loaderData }: Route.ComponentProps) => {
   return (
     <div className="space-y-4 p-4 md:p-8">
       <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">All Rooms</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Semua Kamar</h1>
           <p className="text-muted-foreground">
-            A comprehensive list of all rooms available in your property.
+            List Semua Kamar
           </p>
       </div>
       <RoomsDataTable
