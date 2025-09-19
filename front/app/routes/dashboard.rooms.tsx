@@ -20,7 +20,7 @@ export const clientLoader = async ({ request }: Route.ClientLoaderArgs) => {
 
     return {
       ...room,
-      status: isOccupied,
+      status: isOccupied ? "occupied":"available",
       tenantName:currRental?.tenant_name||null,
       rentedPrice: currRental?.rented_price_monthly||null
     }

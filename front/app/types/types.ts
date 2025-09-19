@@ -49,3 +49,17 @@ export type RoomWithExpandRentalsPb = RoomPb & {
     rentals_via_room?: RentalsPb[];
   };
 };
+
+export type RoomWithStatus = {
+  id: string;
+  created: string;
+  updated: string;
+  owner: string;
+  room_num: string;
+  base_price_month: number;
+  has_ac: boolean;
+  notes: string;
+  status: string;
+  tenantName: string | null;
+  rentedPrice: number | null;
+};

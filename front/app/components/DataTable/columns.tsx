@@ -4,23 +4,10 @@ import { DataTableColumnHeader } from "./datatable-column-header-sort";
 import RoomsTableActions from "../dashboard/rooms/rooms-table-actions";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
+import type { RoomWithStatus } from "~/types/types";
 
-// This represents the data shape after processing in the client loader
-// Duplicating this here for now since patching types.ts is failing.
-// Ideally, this would go in `types.ts`.
-export type RoomWithStatus = {
-  id: string;
-  created: string;
-  updated: string;
-  owner: string;
-  room_num: string;
-  base_price_month: number;
-  has_ac: boolean;
-  notes: string;
-  status: boolean; // isOccupied
-  tenantName: string | null;
-  rentedPrice: number | null;
-};
+
+
 
 export const roomsColumns: ColumnDef<RoomWithStatus>[] = [
   {
