@@ -1,23 +1,103 @@
-import type { RoomPb } from "~/types/types";
+
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./datatable-column-header-sort";
 import RoomsTableActions from "../dashboard/rooms/rooms-table-actions";
+import { Badge } from "../ui/badge";
+import { Checkbox } from "../ui/checkbox";
 
-export const roomsColumns: ColumnDef<RoomPb>[] = [
-  { accessorKey: "room_num", header: "Nomer Kamar" },
-  { accessorKey: "status", header: "Status" },
-  { accessorKey: "has_ac", header: "A/C Terpasang" },
+// This represents the data shape after processing in the client loader
+// Duplicating this here for now since patching types.ts is failing.
+// Ideally, this would go in `types.ts`.
+export type RoomWithStatus = {
+  id: string;
+  created: string;
+  updated: string;
+  owner: string;
+  room_num: string;
+  base_price_month: number;
+  has_ac: boolean;
+  notes: string;
+  status: boolean; // isOccupied
+  tenantName: string | null;
+  rentedPrice: number | null;
+};
+
+export const roomsColumns: ColumnDef<RoomWithStatus>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  { accessorKey: "room_num", header: "Room Number" },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const isOccupied = row.getValue("status");
+      return (
+        <Badge variant={isOccupied ? "destructive" : "secondary"}>
+          {isOccupied ? "Occupied" : "Vacant"}
+        </Badge>
+      );
+    },
+  },
+  { accessorKey: "tenantName", header: "Tenant Name" },
+  {
+    accessorKey: "has_ac",
+    header: "A/C",
+    cell: ({ row }) => {
+      return <div>{row.getValue("has_ac") ? "Yes" : "No"}</div>;
+    },
+  },
   {
     accessorKey: "base_price_month",
     header: ({ column }) => (
       <DataTableColumnHeader
         className="flex-row-reverse"
-        title="Sewa Per Bulan"
+        title="Base Rent"
         column={column}
       />
     ),
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue("base_price_month"));
+      const price = parseFloat(row.getValue("base_price_month")) || 0;
+      const formatted = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(price);
+      return <div className="text-right font-medium">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "rentedPrice",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        className="flex-row-reverse"
+        title="Actual Rent"
+        column={column}
+      />
+    ),
+    cell: ({ row }) => {
+      const price = parseFloat(row.getValue("rentedPrice")) || 0;
+      if (price === 0) {
+        return <div className="text-right font-medium">-</div>;
+      }
       const formatted = new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
@@ -27,7 +107,7 @@ export const roomsColumns: ColumnDef<RoomPb>[] = [
   },
   {
     id: "actions",
-    header: "Aksi",
+    header: "Actions",
     cell: ({ row }) => {
       return <RoomsTableActions row={row}/>
     },
