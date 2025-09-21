@@ -52,14 +52,25 @@ export default function Login() {
     },
   });
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [isLoggedIn, navigate]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate("/dashboard", { replace: true });
+  //   }
+  // }, [isLoggedIn, navigate]);
 
   const onSubmit = async (val: LoginForm) => {
-    await authService.loginWithPass(val);
+    const result = await authService.loginWithPass(val);
+    if (!result.success) {
+      const errorMessage =
+        typeof result.error === "string"
+          ? result.error
+          : "An unexpected error occurred.";
+      toast.error("Error!",{
+        description: errorMessage,
+        position: "top-center",
+        richColors:true
+      });
+    }
   };
   const handleGoogleLogin = async () => {
     const result = await authService.loginWithGoogle();

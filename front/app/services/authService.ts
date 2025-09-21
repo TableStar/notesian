@@ -8,8 +8,15 @@ const loginWithPass = async (data: LoginForm) => {
       .authWithPassword(data.email, data.password);
 
     return { success: true, user: authRes.record };
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
+    if ((error?.response?.message as string).includes("Failed to authenticate")) {
+      return {
+        success: false,
+        error:
+          "Password atau Email anda tidak ditemukan",
+      };
+    }
     return { success: false, error };
   }
 };
@@ -19,7 +26,6 @@ const loginWithGoogle = async () => {
     const authRes = await pb
       .collection("users")
       .authWithOAuth2({ provider: "google" });
-    console.log("LOGGED IN", authRes);
     return { success: true, user: authRes.record };
   } catch (error: any) {
     if (error?.response?.message === "Failed to create record.") {
