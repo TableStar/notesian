@@ -1,30 +1,28 @@
-import type { Route } from "./+types/_index";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { Button } from "~/components/ui/button";
-import { Building, Chrome } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
-import { loginSchema, type LoginForm } from "~/types/types";
-import { redirect, useNavigate } from "react-router";
-import { authService } from "~/services/authService";
-import { pb } from "~/lib/pocketbase";
-import { useAuth } from "~/contexts/authContext";
-import { useEffect } from "react";
+ import type { Route } from "./+types/_index";
+ import {
+   Card,
+   CardContent,
+   CardFooter,
+   CardHeader,
+   CardTitle,
+ } from "~/components/ui/card";
+ import { Input } from "~/components/ui/input";
+ import { Button } from "~/components/ui/button";
+ import { Building, Chrome } from "lucide-react";
+ import { useForm } from "react-hook-form";
+ import { zodResolver } from "@hookform/resolvers/zod";
+ import {
+   Form,
+   FormControl,
+   FormField,
+   FormItem,
+   FormLabel,
+   FormMessage,
+ } from "~/components/ui/form";
+ import { loginSchema, type LoginForm } from "~/types/types";
+ import { redirect, useSubmit, useNavigation, useFetcher } from "react-router";
+ import { authService } from "~/services/authService";
+ import { pb } from "~/lib/pocketbase";
 import { toast } from "sonner";
 
 export function meta({}: Route.MetaArgs) {
@@ -34,33 +32,34 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function clientLoader({}: Route.ClientLoaderArgs) {
-  if (pb.authStore.isValid) {
-    return redirect("/dashboard");
-  }
-  return null;
-}
+ export async function clientLoader({}: Route.ClientLoaderArgs) {
+   if (pb.authStore.isValid) {
+     return redirect("/dashboard");
+   }
+   return null;
+ }
 
-export default function Login() {
-  const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
-  const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+ export async function clientAction({ request }: Route.ClientActionArgs) {
+   const formData = await request.formData();
+   const data = Object.fromEntries(formData);
 
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-  //     navigate("/dashboard", { replace: true });
-  //   }
-  // }, [isLoggedIn, navigate]);
-
-  const onSubmit = async (val: LoginForm) => {
-    const result = await authService.loginWithPass(val);
-    if (!result.success) {
+   if (data.google) {
+     const result = await authService.loginWithGoogle();
+     if (!result.success) {
+      const errorMessage =
+        typeof result.error === "string"
+          ? result.error
+          : "An unexpected error occurred.";
+      toast.error("Error Login With Google",{
+        description: errorMessage,
+        position: "top-center",
+        richColors:true
+      });
+      return
+    }
+   } else {
+     const result = await authService.loginWithPass(data as LoginForm);
+     if (!result.success) {
       const errorMessage =
         typeof result.error === "string"
           ? result.error
@@ -70,22 +69,33 @@ export default function Login() {
         position: "top-center",
         richColors:true
       });
+      return;
     }
-  };
-  const handleGoogleLogin = async () => {
-    const result = await authService.loginWithGoogle();
-    if (!result.success) {
-      const errorMessage =
-        typeof result.error === "string"
-          ? result.error
-          : "An unexpected error occurred.";
-      toast.error("Error Error ERROR",{
-        description: errorMessage,
-        position: "top-center",
-        richColors:true
-      });
-    }
-  };
+   }
+
+   return redirect("/dashboard");
+ }
+
+ export default function Login() {
+   const form = useForm<LoginForm>({
+     resolver: zodResolver(loginSchema),
+     defaultValues: {
+       email: "",
+       password: "",
+     },
+   });
+
+   const submit = useSubmit();
+   const navigation = useNavigation();
+   const fetcher = useFetcher();
+
+   const onSubmit = (val: LoginForm) => {
+     submit(val, { method: "post" });
+   };
+
+   const handleGoogleLogin = () => {
+     fetcher.submit({ google: true }, { method: "post" });
+   };
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen gap-12">
@@ -152,9 +162,9 @@ export default function Login() {
           </Form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" form="login-form" className="w-full">
-            Log In
-          </Button>
+           <Button type="submit" form="login-form" className="w-full" disabled={navigation.state === "submitting"}>
+             {navigation.state === "submitting" ? "Logging in..." : "Log In"}
+           </Button>
           <div className="flex my-6 items-center w-full">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-4 flex-shrink-0 text-xs uppercase text-muted-foreground">
@@ -162,14 +172,14 @@ export default function Login() {
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
-          <Button
-            onClick={handleGoogleLogin}
-            variant="outline"
-            className="w-full"
-          >
-            <Chrome className="w-4 h-4 mr-2" />
-            Sign In dengan Google
-          </Button>
+           <Button
+             onClick={handleGoogleLogin}
+             variant="outline"
+             className="w-full"
+             disabled={fetcher.state === "submitting"}
+           >
+             {fetcher.state === "submitting" ? "Signing in..." : <><Chrome className="w-4 h-4 mr-2" />Sign In dengan Google</>}
+           </Button>
         </CardFooter>
       </Card>
     </div>
