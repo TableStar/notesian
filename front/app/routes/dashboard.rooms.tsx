@@ -3,6 +3,7 @@ import type { Route } from "./+types/dashboard.rooms";
 import type { RoomWithExpandRentalsPb } from "~/types/types";
 import { RoomsDataTable } from "~/components/DataTable/rooms-datatable";
 import { roomsColumns } from "~/components/DataTable/columns";
+import { RoomCardMinimal } from "~/components/dashboard/rooms/room-card-minimal";
 
 export const clientLoader = async ({ request }: Route.ClientLoaderArgs) => {
   const searchParams = new URL(request.url).searchParams;
@@ -45,11 +46,12 @@ const Rooms = ({ loaderData }: Route.ComponentProps) => {
             List Semua Kamar
           </p>
       </div>
-      <RoomsDataTable
-        columns={roomsColumns}
-        data={roomsWithStatus}
-        paginationData={paginationData}
-      />
+       <RoomsDataTable
+         columns={roomsColumns}
+         data={roomsWithStatus}
+         paginationData={paginationData}
+         mobileCardComponent={RoomCardMinimal}
+       />
     </div>
   );
 };

@@ -31,8 +31,8 @@ import {
 import { Button } from "../ui/button";
 import { ChevronsLeft, ChevronsRight, SlidersHorizontal } from "lucide-react";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { MobileDataTableCards } from "./mobile-room-cards";
-import type { RoomWithStatus } from "~/types/types";
+import { MobileDataTableCards } from "./mobile-data-cards";
+import React from "react";
 
 type PaginationData = {
   page: number;
@@ -45,12 +45,19 @@ type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   paginationData?: PaginationData;
+  mobileCardComponent?: React.ComponentType<{
+    item: TData;
+    onView?: (item: TData) => void;
+    onEdit?: (item: TData) => void;
+    onDelete?: (item: TData) => void;
+  }>;
 };
 
 export const RoomsDataTable = <TData, TValue>({
   columns,
   data,
   paginationData,
+  mobileCardComponent,
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -90,7 +97,9 @@ export const RoomsDataTable = <TData, TValue>({
 
 
 
-  // Get the processed data from the table (filtered and sorted)
+  // Extract the original data from TanStack Table's row model.
+  // This ensures the mobile view displays the same filtered, sorted, and paginated data as the desktop table.
+  // table.getRowModel().rows provides Row<TData> objects with metadata; we map to get the raw TData[].
   const processedData = table.getRowModel().rows.map(row => row.original);
 
 
@@ -151,14 +160,19 @@ export const RoomsDataTable = <TData, TValue>({
         </div>
       </div>
 
-      {isMobile ? (
-        <MobileDataTableCards
-          data={processedData as RoomWithStatus[]} // Type assertion for now - you may want to properly type this
-          onViewRoom={(room) => console.log("View room:", room)}
-          onEditRoom={(room) => console.log("Edit room:", room)}
-          onDeleteRoom={(room) => console.log("Delete room:", room)}
-        />
-      ) : (
+       {isMobile ? (
+         mobileCardComponent ? (
+           <MobileDataTableCards
+             data={processedData}
+             cardComponent={mobileCardComponent}
+             onView={(room) => console.log("View room:", room)}
+             onEdit={(room) => console.log("Edit room:", room)}
+             onDelete={(room) => console.log("Delete room:", room)}
+           />
+         ) : (
+           <div>No mobile component provided</div>
+         )
+       ) : (
         <>
           <div className="overflow-auto rounded-md border">
             <Table>
